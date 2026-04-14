@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  sku         String   @unique
+  name        String
+  description String?
+  price       Float?   // Optional to support "ND" (Not Determined)
+  state       String   @default("Unknown")
+  image       String?  // Image url, nullable
+  weight      Float    @default(1.0) // Used for Shiprocket (kg)
+  length      Float    @default(10.0) // Used for Shiprocket (cm)
+  breadth     Float    @default(10.0) // Used for Shiprocket (cm)
+  height      Float    @default(10.0) // Used for Shiprocket (cm)
+  
+  orderItems  OrderItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Order {
+  id                   String   @id @default(cuid())
+  razorpayOrderId      String?  @unique
+  shiprocketShipmentId String?  @unique
+  
+  // Statuses
+  paymentStatus        String   @default("PENDING") // PENDING, PAID, FAILED
+  orderStatus          String   @default("NEW") // NEW, SHIPPED, DELIVERED
+  amount             Float
+  
+  // Shiprocket Customer/Billing & Shipping Info
+  customerFirstName  String
+  customerLastName   String?
+  email              String
+  phone              String
+  
+  billingAddress     String
+  billingCity        String
+  billingState       String
+  billingPincode     String
+  billingCountry     String   @default("India")
+  
+  orderItems         OrderItem[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model OrderItem {
+  id              String   @id @default(cuid())
+  orderId         String
+  productId       String
+  quantity        Int
+  priceAtPurchase Float
+  
+  order           Order    @relation(fields: [orderId], references: [id])
+  product         Product  @relation(fields: [productId], references: [id])
+}

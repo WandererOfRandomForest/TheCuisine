@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import SplashScreen from "./components/SplashScreen";
+import Navbar from "./components/Navbar";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const sans = Plus_Jakarta_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
@@ -25,23 +27,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${outfit.variable} h-full antialiased`}
+      className={`${sans.variable} ${playfair.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col font-sans">
-        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-4 flex justify-between items-center shadow-sm">
-          <div className="text-2xl font-bold tracking-tight text-gray-900" style={{ fontFamily: 'var(--font-outfit)' }}>
-            The<span className="text-amber-600">Cuisine.</span>
-          </div>
-          <nav className="hidden md:flex gap-8 text-sm font-medium text-gray-600">
-            <a href="/" className="hover:text-amber-600 transition-colors">Home</a>
-            <a href="#map" className="hover:text-amber-600 transition-colors">Explore States</a>
-          </nav>
-        </header>
-        <main className="flex-1">
+      <body className="min-h-full flex flex-col font-sans tracking-wide">
+        <SplashScreen />
+        <Navbar />
+        <main className="flex-1 bg-[#FAF3E7]">
           {children}
         </main>
-        <footer className="py-8 text-center text-sm text-gray-500 border-t border-gray-100 shrink-0">
-          © {new Date().getFullYear()} TheCuisine. Dedicated to authentic flavors.
+        <footer className="py-8 text-center text-sm shrink-0 bg-[#240502] text-[#FAF3E7]/70">
+          <p className="font-medium">© {new Date().getFullYear()} TheCuisine. Dedicated to authentic flavors.</p>
         </footer>
       </body>
     </html>

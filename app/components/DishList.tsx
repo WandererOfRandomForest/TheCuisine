@@ -6,15 +6,15 @@ import { ShoppingBag } from "lucide-react";
 
 interface DishListProps {
   stateName: string;
-  dishes: Dish[];
-  onBuyNow: (dish: Dish) => void;
+  dishes: any[];
+  onBuyNow: (dish: any) => void;
 }
 
 export default function DishList({ stateName, dishes, onBuyNow }: DishListProps) {
   if (dishes.length === 0) {
     return (
       <div className="w-full max-w-4xl mx-auto py-12 px-6 text-center">
-        <h2 className="text-3xl font-bold font-outfit mb-4 text-gray-800">
+        <h2 className="text-3xl font-bold font-playfair mb-4 text-[#1A1A1A]">
           Dishes from {stateName}
         </h2>
         <div className="premium-card p-12 bg-gray-50 flex flex-col items-center justify-center text-gray-400">
@@ -30,8 +30,8 @@ export default function DishList({ stateName, dishes, onBuyNow }: DishListProps)
     <div className="w-full max-w-5xl mx-auto py-12 px-6">
       <div className="mb-8 flex items-end justify-between">
         <div>
-          <span className="text-amber-600 font-semibold tracking-wider text-sm uppercase">Authentic Selection</span>
-          <h2 className="text-4xl font-bold font-outfit text-gray-900 mt-1">
+          <span className="text-[#FFE170] font-semibold tracking-wider text-sm uppercase">Authentic Selection</span>
+          <h2 className="text-5xl font-bold font-playfair text-[#1A1A1A] mt-2">
             Taste of {stateName}
           </h2>
         </div>
@@ -42,7 +42,7 @@ export default function DishList({ stateName, dishes, onBuyNow }: DishListProps)
           <div key={dish.id} className="premium-card flex flex-col overflow-hidden group">
             <div className="h-64 overflow-hidden relative bg-gray-100">
               <img 
-                src={dish.image} 
+                src={dish.image || "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&q=80"} 
                 alt={dish.name} 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />
@@ -51,15 +51,17 @@ export default function DishList({ stateName, dishes, onBuyNow }: DishListProps)
             
             <div className="p-6 flex-1 flex flex-col">
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-2xl font-bold font-outfit text-gray-900">{dish.name}</h3>
-                <span className="text-lg font-semibold text-amber-600">₹{dish.price}</span>
+                <h3 className="text-3xl font-bold font-playfair text-[#1A1A1A]">{dish.name}</h3>
+                <span className="text-xl font-semibold text-[#FFE170]">
+                  {dish.price ? `₹${dish.price}` : "ND"}
+                </span>
               </div>
               
-              <p className="text-gray-600 flex-1 leading-relaxed">{dish.description}</p>
+              <p className="text-gray-600 flex-1 leading-relaxed">{dish.description || "Fresh local authentic delivery."}</p>
               
               <button 
                 onClick={() => onBuyNow(dish)}
-                className="mt-6 w-full py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-amber-600 transition-colors shadow-lg shadow-amber-600/20 active:scale-[0.98]"
+                className="mt-6 w-full py-3 bg-[#FFE170] text-[#380903] rounded-xl font-semibold hover:bg-[#FFD100] transition-colors shadow-lg shadow-[#FFE170]/20 active:scale-[0.98]"
               >
                 Buy Now
               </button>
