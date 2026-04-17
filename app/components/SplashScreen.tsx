@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function SplashScreen() {
   const [show, setShow] = useState(true);
@@ -27,7 +28,7 @@ export default function SplashScreen() {
 
   if (!render) return null;
 
-  const text = "TheCuisine".split("");
+
 
   return (
     <div 
@@ -45,15 +46,18 @@ export default function SplashScreen() {
         }
       `}</style>
       
-      <img
+      <Image
         src="/images/Logo.jpeg"
         alt="The Cuisine Loading"
+        width={400}
+        height={200}
         className="h-32 md:h-48 w-auto object-contain drop-shadow-xl"
         style={{
           animation: 'wipe-reveal 3s cubic-bezier(0.25, 1, 0.5, 1) forwards',
           animationDelay: '0.2s',
           opacity: 0 // Start hidden until animation begins
         }}
+        priority
       />
     </div>
   );

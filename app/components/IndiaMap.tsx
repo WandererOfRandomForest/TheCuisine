@@ -4,6 +4,18 @@ import React, { useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { geoCentroid, geoArea } from "d3-geo";
 
+interface GeoProperties {
+  st_nm?: string;
+  NAME_1?: string;
+  name?: string;
+}
+
+interface GeoObject {
+  properties: GeoProperties;
+  rsmKey?: string;
+  [key: string]: any;
+}
+
 const INDIA_TOPO_JSON = "https://raw.githubusercontent.com/udit-001/india-maps-data/main/topojson/india.json";
 
 interface IndiaMapProps {
@@ -15,7 +27,7 @@ export default function IndiaMap({ onStateClick }: IndiaMapProps) {
 
   // Custom mapping for statename to ID. 
   // TopoJSON often has its own ID formats or name formats, so we handle it dynamically
-  const handleStateClick = (geo: any) => {
+  const handleStateClick = (geo: GeoObject) => {
     const stateName = geo.properties.st_nm || geo.properties.NAME_1 || geo.properties.name || "Unknown";
     let stateId = "UNKNOWN";
 
@@ -82,7 +94,7 @@ export default function IndiaMap({ onStateClick }: IndiaMapProps) {
               {(() => {
                 // Many topological maps split states into districts or multiple polygons. 
                 // We calculate the largest sub-region for each state to center the label correctly once per state.
-                const largestGeoByState = new Map<string, { geo: any; area: number }>();
+                const largestGeoByState = new Map<string, { geo: GeoObject; area: number }>();
                 
                 geographies.forEach((geo) => {
                   const stateName = geo.properties.st_nm || geo.properties.NAME_1 || geo.properties.name || "";
@@ -95,8 +107,9 @@ export default function IndiaMap({ onStateClick }: IndiaMapProps) {
                 });
 
                 return Array.from(largestGeoByState.values()).map(({ geo }) => {
-                  const centroid = geoCentroid(geo);
-                  let stateName = geo.properties.st_nm || geo.properties.NAME_1 || geo.properties.name || "";
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const centroid = geoCentroid(geo as any);
+                  const stateName = geo.properties.st_nm || geo.properties.NAME_1 || geo.properties.name || "";
                   
                   // Filter out unwanted small UTs/cities (Keep Delhi)
                   const isExcluded = ["Chandigarh", "Puducherry", "Lakshadweep", "Andaman", "Dadra", "Daman", "Nicobar"].some(ignored => stateName.includes(ignored));

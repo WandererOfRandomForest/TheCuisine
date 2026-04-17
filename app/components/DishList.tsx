@@ -1,13 +1,20 @@
 "use client";
 
-import React from "react";
-import { Dish } from "../lib/data";
+import Image from "next/image";
 import { ShoppingBag } from "lucide-react";
+
+interface DishData {
+  id: string;
+  name: string;
+  description?: string | null;
+  price?: number | null;
+  image?: string | null;
+}
 
 interface DishListProps {
   stateName: string;
-  dishes: any[];
-  onBuyNow: (dish: any) => void;
+  dishes: DishData[];
+  onBuyNow: (dish: DishData) => void;
 }
 
 export default function DishList({ stateName, dishes, onBuyNow }: DishListProps) {
@@ -41,10 +48,12 @@ export default function DishList({ stateName, dishes, onBuyNow }: DishListProps)
         {dishes.map((dish) => (
           <div key={dish.id} className="premium-card flex flex-col overflow-hidden group">
             <div className="h-64 overflow-hidden relative bg-gray-100">
-              <img 
+              <Image 
                 src={dish.image || "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&q=80"} 
                 alt={dish.name} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>

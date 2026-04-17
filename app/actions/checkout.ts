@@ -1,7 +1,5 @@
 "use server";
 
-import { Dish } from "../lib/data";
-
 interface CheckoutResult {
   success: boolean;
   orderId?: string;
@@ -34,7 +32,7 @@ export async function createRazorpayOrder(dishId: string, price: number): Promis
  * MOCK: Create Shiprocket Shipment
  * In a real scenario, you would trigger this via a Razorpay Webhook after successful payment.
  */
-export async function generateShiprocketOrder(paymentId: string, userDetails: any) {
+export async function generateShiprocketOrder(paymentId: string, userDetails: Record<string, unknown>) {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 800));
 

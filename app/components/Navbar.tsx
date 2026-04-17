@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -25,17 +27,20 @@ export default function Navbar() {
           : "bg-[#FFE170] border-b border-transparent shadow-none"
       }`}
     >
-      <a href="/" className="flex items-center shrink-0">
-        <img 
+      <Link href="/" className="flex items-center shrink-0">
+        <Image 
           src="/images/Logo.jpeg" 
           alt="The Cuisine Logo" 
+          width={120}
+          height={48}
           className="h-12 w-auto object-contain rounded-lg shadow-sm"
+          priority
         />
-      </a>
+      </Link>
       <nav className={`hidden md:flex gap-8 text-sm font-medium transition-colors duration-700 ease-in-out ${
         scrolled ? "text-[#FFE170]" : "text-[#380903]"
       }`}>
-        <a href="/" className="hover:opacity-60 transition-opacity">Home</a>
+        <Link href="/" className="hover:opacity-60 transition-opacity">Home</Link>
         <a href="#map" className="hover:opacity-60 transition-opacity">Explore States</a>
         <a href="#contact" className="hover:opacity-60 transition-opacity">Contact</a>
       </nav>

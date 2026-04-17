@@ -7,11 +7,18 @@ import { ChevronDown } from "lucide-react";
 import { getProductsByState } from "./actions/products";
 import { createRazorpayOrder, generateShiprocketOrder } from "./actions/checkout";
 
+interface DishData {
+  id: string;
+  name: string;
+  description?: string | null;
+  price?: number | null;
+  image?: string | null;
+}
+
 export default function Home() {
   const [selectedStateId, setSelectedStateId] = useState<string | null>(null);
   const [selectedStateName, setSelectedStateName] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [dbDishes, setDbDishes] = useState<any[]>([]);
+  const [dbDishes, setDbDishes] = useState<DishData[]>([]);
 
   const handleStateClick = async (stateId: string, stateName: string) => {
     setSelectedStateId(stateId);
@@ -20,9 +27,9 @@ export default function Home() {
     // Fetch newly seeded products from DB
     try {
       const dbProducts = await getProductsByState(stateName);
-      setDbDishes(dbProducts);
-    } catch(e) {
-      console.error(e);
+      setDbDishes(dbProducts as DishData[]);
+    } catch {
+      console.error("Failed to fetch products");
     }
 
     // Smooth scroll down to dishes
@@ -31,16 +38,12 @@ export default function Home() {
     }, 100);
   };
 
-  const handleBuyNow = async (dish: any) => {
+  const handleBuyNow = async (dish: DishData) => {
     try {
-      setIsProcessing(true);
-      // Backend handles integration silently behind the processing state.
-      const order = await createRazorpayOrder(dish.id, dish.price);
+      // Backend handles integration silently
+      const order = await createRazorpayOrder(dish.id, dish.price || 0);
       
       if (order.success && order.orderId) {
-        // Here you would pop open the official Razorpay JS execution window:
-        // const rzp = new window.Razorpay(options); rzp.open();
-        
         // For development, we just silently trigger the ship mock.
         const shipment = await generateShiprocketOrder(
            `pay_mock_${Math.random().toString(36).substring(2)}`, 
@@ -49,10 +52,8 @@ export default function Home() {
         
         console.log(`[Order Flow] Successfully generated DB shipment:`, shipment.shipment_id);
       }
-    } catch (e) {
+    } catch {
       console.error("Error during checkout sequence.");
-    } finally {
-      setIsProcessing(false);
     }
   };
 
@@ -108,7 +109,7 @@ export default function Home() {
               Contact Us
             </h2>
             <p className="mt-6 text-lg opacity-90 max-w-2xl mx-auto">
-              We're passionate about bringing authentic regional flavors straight to your table. Having trouble with an order or just want to say hi? We'd love to hear from you.
+              We&apos;re passionate about bringing authentic regional flavors straight to your table. Having trouble with an order or just want to say hi? We&apos;d love to hear from you.
             </p>
           </div>
           
