@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { geoCentroid, geoArea } from "d3-geo";
+import { feature } from "topojson-client";
+import indiaMapData from "./india.json";
 
 interface GeoProperties {
   st_nm?: string;
@@ -16,11 +18,26 @@ interface GeoObject {
   [key: string]: any;
 }
 
-const INDIA_TOPO_JSON = "https://raw.githubusercontent.com/udit-001/india-maps-data/main/topojson/india.json";
-
 interface IndiaMapProps {
   onStateClick: (stateId: string, stateName: string) => void;
 }
+
+// Safely extract geography data supporting both direct JSON and ES Module default wrapping
+const getGeographyData = () => {
+  try {
+    const rawData = (indiaMapData as any).default || indiaMapData;
+    if (rawData && rawData.objects && rawData.objects.states) {
+      return feature(rawData, rawData.objects.states as any);
+    }
+    console.error("Invalid TopoJSON structure in india.json:", rawData);
+    return null;
+  } catch (err) {
+    console.error("Error parsing india.json:", err);
+    return null;
+  }
+};
+
+const geographyData = getGeographyData();
 
 export default function IndiaMap({ onStateClick }: IndiaMapProps) {
   const [hoveredState, setHoveredState] = useState<string | null>(null);
@@ -38,10 +55,18 @@ export default function IndiaMap({ onStateClick }: IndiaMapProps) {
     onStateClick(stateId, stateName);
   };
 
+  if (!geographyData) {
+    return (
+      <div className="w-full min-h-[300px] flex items-center justify-center text-[#380903]/70 font-semibold font-playfair text-xl">
+        Map Error: Failed to parse coordinates.
+      </div>
+    );
+  }
+
   return (
-    <div className="relative w-full max-w-[80vh] lg:max-w-3xl mx-auto drop-shadow-xl">
+    <div className="relative w-full self-stretch aspect-[4/3] min-h-[300px] sm:min-h-0 max-w-[80vh] lg:max-w-3xl mx-auto drop-shadow-xl shrink-0">
       {hoveredState && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-sm px-6 py-2 rounded-xl shadow-[0_4px_20px_rgba(56,9,3,0.15)] font-playfair text-[#380903] pointer-events-none transition-opacity font-bold z-10 border border-[#FFE170]/50 text-xl tracking-wide text-center min-w-[150px]">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 md:top-6 bg-white/95 backdrop-blur-sm px-6 py-2 rounded-xl shadow-[0_4px_20px_rgba(56,9,3,0.15)] font-playfair text-[#380903] pointer-events-none transition-opacity font-bold z-10 border border-[#FFE170]/50 text-xl tracking-wide text-center min-w-[150px]">
           {hoveredState}
         </div>
       )}
@@ -51,9 +76,9 @@ export default function IndiaMap({ onStateClick }: IndiaMapProps) {
           scale: 1050,
           center: [82.8, 22.5] // Center over India
         }}
-        className="w-full h-full p-4 rounded-[2rem] drop-shadow-[0_0_15px_rgba(56,9,3,0.05)] bg-transparent"
+        className="absolute inset-0 w-full h-full p-4 bg-transparent"
       >
-        <Geographies geography={INDIA_TOPO_JSON}>
+        <Geographies geography={geographyData}>
           {({ geographies }) => (
             <>
               {geographies.map((geo) => {
@@ -70,8 +95,8 @@ export default function IndiaMap({ onStateClick }: IndiaMapProps) {
                     style={{
                       default: {
                         fill: isOdisha ? "#FCF3D7" : "#FAF3E7", // Lighter yellow for Odisha, off-white for others
-                        stroke: "rgba(56, 9, 3, 0.25)", // Thin wine red border
-                        strokeWidth: 0.6,
+                        stroke: "rgba(56, 9, 3, 0.45)", // Higher opacity border for better mobile visibility
+                        strokeWidth: 0.8, // Slightly thicker stroke to prevent Retina anti-aliasing collapse
                         outline: "none",
                         transition: "all 250ms",
                       },
@@ -124,11 +149,11 @@ export default function IndiaMap({ onStateClick }: IndiaMapProps) {
                         y={2}
                         fontSize={11}
                         textAnchor="middle"
-                        fill="rgba(56, 9, 3, 0.45)"
+                        fill="rgba(56, 9, 3, 0.75)" // Higher contrast label color
                         className="font-playfair font-bold"
                         style={{ 
                           pointerEvents: "none", 
-                          textShadow: "1px 1px 0px rgba(255,255,255,0.9), -1px -1px 0px rgba(255,255,255,0.9), 1px -1px 0px rgba(255,255,255,0.9), -1px 1px 0px rgba(255,255,255,0.9)" 
+                          textShadow: "1px 1px 0px #FAF3E7, -1px -1px 0px #FAF3E7, 1px -1px 0px #FAF3E7, -1px 1px 0px #FAF3E7" // Knockout matching body background rather than pure white
                         }}
                       >
                         {shortName}

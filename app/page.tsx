@@ -3,9 +3,9 @@
 import { useState } from "react";
 import IndiaMap from "./components/IndiaMap";
 import DishList from "./components/DishList";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, MapPin, Phone, Mail } from "lucide-react";
 import { getProductsByState } from "./actions/products";
-import { createRazorpayOrder, generateShiprocketOrder } from "./actions/checkout";
+import CheckoutModal from "./components/CheckoutModal";
 
 interface DishData {
   id: string;
@@ -19,6 +19,7 @@ export default function Home() {
   const [selectedStateId, setSelectedStateId] = useState<string | null>(null);
   const [selectedStateName, setSelectedStateName] = useState<string | null>(null);
   const [dbDishes, setDbDishes] = useState<DishData[]>([]);
+  const [checkoutDish, setCheckoutDish] = useState<DishData | null>(null);
 
   const handleStateClick = async (stateId: string, stateName: string) => {
     setSelectedStateId(stateId);
@@ -28,8 +29,8 @@ export default function Home() {
     try {
       const dbProducts = await getProductsByState(stateName);
       setDbDishes(dbProducts as DishData[]);
-    } catch {
-      console.error("Failed to fetch products");
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
     }
 
     // Smooth scroll down to dishes
@@ -38,23 +39,8 @@ export default function Home() {
     }, 100);
   };
 
-  const handleBuyNow = async (dish: DishData) => {
-    try {
-      // Backend handles integration silently
-      const order = await createRazorpayOrder(dish.id, dish.price || 0);
-      
-      if (order.success && order.orderId) {
-        // For development, we just silently trigger the ship mock.
-        const shipment = await generateShiprocketOrder(
-           `pay_mock_${Math.random().toString(36).substring(2)}`, 
-           { name: "User", address: "Localhost 3000" }
-        );
-        
-        console.log(`[Order Flow] Successfully generated DB shipment:`, shipment.shipment_id);
-      }
-    } catch {
-      console.error("Error during checkout sequence.");
-    }
+  const handleBuyNow = (dish: DishData) => {
+    setCheckoutDish(dish);
   };
 
   return (
@@ -62,7 +48,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="bg-[#FFE170] text-[#380903] min-h-[calc(100vh-88px)] flex flex-col justify-center overflow-hidden">
         <section className="px-6 text-center max-w-4xl mx-auto flex flex-col items-center py-8">
-          <h1 className="text-5xl md:text-7xl font-bold font-playfair mb-4 tracking-tight leading-tight opacity-0 animate-[fade-in-up_1s_ease-out_forwards]">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-playfair mb-4 tracking-tight leading-tight opacity-0 animate-[fade-in-up_1s_ease-out_forwards]">
             Discover the authentic taste of <br className="hidden md:block" />
             <span className="text-[#380903]">The Cuisine</span>
           </h1>
@@ -79,7 +65,7 @@ export default function Home() {
 
       {/* Map Section */}
       <section id="map" className="scroll-mt-[88px] min-h-[calc(100vh-88px)] flex flex-col items-center justify-center py-8 px-6">
-        <div className="w-full flex-1 flex flex-col items-center justify-center max-h-full">
+        <div className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center">
           <IndiaMap onStateClick={handleStateClick} />
           {!selectedStateName && (
             <p className="text-center text-sm mt-8 animate-pulse text-[#380903]/70 font-medium">
@@ -100,6 +86,14 @@ export default function Home() {
         </section>
       )}
 
+      {checkoutDish && selectedStateName && (
+        <CheckoutModal
+          dish={checkoutDish}
+          stateName={selectedStateName}
+          onClose={() => setCheckoutDish(null)}
+        />
+      )}
+
       {/* Contact Us Section */}
       <section id="contact" className="py-20 px-6 bg-[#380903] text-[#FAF3E7] scroll-mt-10">
         <div className="max-w-5xl mx-auto">
@@ -115,19 +109,19 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex flex-col items-center text-center p-8 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
-              <span className="text-4xl mb-4 text-[#FFE170]">📍</span>
+              <MapPin className="w-8 h-8 mb-4 text-[#FFE170]" strokeWidth={1.5} />
               <h3 className="text-xl font-bold font-playfair mb-3 text-white">Our Kitchen</h3>
               <p className="opacity-80 font-medium">123 Spice Route, New Delhi<br/>India 110001</p>
             </div>
             
             <div className="flex flex-col items-center text-center p-8 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
-              <span className="text-4xl mb-4 text-[#FFE170]">📞</span>
+              <Phone className="w-8 h-8 mb-4 text-[#FFE170]" strokeWidth={1.5} />
               <h3 className="text-xl font-bold font-playfair mb-3 text-white">Phone</h3>
               <p className="opacity-80 font-medium">+91 98765 43210<br/>Mon-Fri, 9am - 6pm</p>
             </div>
             
             <div className="flex flex-col items-center text-center p-8 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
-              <span className="text-4xl mb-4 text-[#FFE170]">✉️</span>
+              <Mail className="w-8 h-8 mb-4 text-[#FFE170]" strokeWidth={1.5} />
               <h3 className="text-xl font-bold font-playfair mb-3 text-white">Email</h3>
               <p className="opacity-80 font-medium">hello@thecuisine.com<br/>Support 24/7</p>
             </div>

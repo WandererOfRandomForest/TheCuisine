@@ -38,7 +38,7 @@ export default function DishList({ stateName, dishes, onBuyNow }: DishListProps)
       <div className="mb-8 flex items-end justify-between">
         <div>
           <span className="text-[#FFE170] font-semibold tracking-wider text-sm uppercase">Authentic Selection</span>
-          <h2 className="text-5xl font-bold font-playfair text-[#1A1A1A] mt-2">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-playfair text-[#1A1A1A] mt-2">
             Taste of {stateName}
           </h2>
         </div>
@@ -60,7 +60,7 @@ export default function DishList({ stateName, dishes, onBuyNow }: DishListProps)
             
             <div className="p-6 flex-1 flex flex-col">
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-3xl font-bold font-playfair text-[#1A1A1A]">{dish.name}</h3>
+                <h3 className="text-2xl sm:text-3xl font-bold font-playfair text-[#1A1A1A]">{dish.name}</h3>
                 <span className="text-xl font-semibold text-[#FFE170]">
                   {dish.price ? `₹${dish.price}` : "ND"}
                 </span>

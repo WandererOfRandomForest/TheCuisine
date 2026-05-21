@@ -4,45 +4,55 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function SplashScreen() {
-  const [show, setShow] = useState(true);
-  const [render, setRender] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
-    // Total animation: 
-    // 11 letters * 0.08s = ~0.9s + 0.6s animation time = 1.5s total typing time
-    // Slowed down animation: 3.0s duration + 0.2s delay = 3.2s.
-    // Let it rest for 0.8s. Hide at 4.0s.
-    const hideTimer = setTimeout(() => {
-      setShow(false);
-    }, 4000);
+    // Only run on client
+    setMounted(true);
+    // Trigger fade-in after a micro-delay to let the DOM paint
+    const showTimeout = setTimeout(() => {
+      setShow(true);
+    }, 50);
 
-    const cleanupTimer = setTimeout(() => {
-      setRender(false);
-    }, 5000); // wait for 1s opacity transition
+    // Fade out splash screen after 3.2s
+    const hideTimeout = setTimeout(() => {
+      setShow(false);
+    }, 3200);
+
+    // Completely unmount splash screen after 4.2s (allowing fade transition)
+    const cleanupTimeout = setTimeout(() => {
+      setMounted(false);
+    }, 4200);
 
     return () => {
-      clearTimeout(hideTimer);
-      clearTimeout(cleanupTimer);
+      clearTimeout(showTimeout);
+      clearTimeout(hideTimeout);
+      clearTimeout(cleanupTimeout);
     };
   }, []);
 
-  if (!render) return null;
-
-
+  // SSR will bypass this completely, rendering the homepage content underneath.
+  // This guarantees that if client JS fails or takes time to load, the homepage
+  // is still visible and never permanently blocked behind a black screen.
+  if (!mounted) return null;
 
   return (
     <div 
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#380903] transition-opacity duration-1000 ease-in-out ${show ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#380903] transition-opacity duration-1000 ease-in-out ${
+        show ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
     >
-      {/* 
-        Instead of guessing fonts, we use the actual logo file and apply a CSS mask (clip-path) 
-        to reveal it from left to right, mimicking a writing/unveiling effect! 
-      */}
       <style>{`
-        @keyframes wipe-reveal {
-          0% { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); opacity: 0; }
-          1% { opacity: 1; }
-          100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); opacity: 1; }
+        @keyframes scale-fade-reveal {
+          0% { 
+            transform: scale(0.9); 
+            opacity: 0; 
+          }
+          100% { 
+            transform: scale(1); 
+            opacity: 1; 
+          }
         }
       `}</style>
       
@@ -53,9 +63,8 @@ export default function SplashScreen() {
         height={200}
         className="h-32 md:h-48 w-auto object-contain drop-shadow-xl"
         style={{
-          animation: 'wipe-reveal 3s cubic-bezier(0.25, 1, 0.5, 1) forwards',
-          animationDelay: '0.2s',
-          opacity: 0 // Start hidden until animation begins
+          animation: 'scale-fade-reveal 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          opacity: 0
         }}
         priority
       />
