@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { geoCentroid, geoArea } from "d3-geo";
 import { feature } from "topojson-client";
@@ -15,7 +15,7 @@ interface GeoProperties {
 interface GeoObject {
   properties: GeoProperties;
   rsmKey?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface IndiaMapProps {
@@ -25,8 +25,10 @@ interface IndiaMapProps {
 // Safely extract geography data supporting both direct JSON and ES Module default wrapping
 const getGeographyData = () => {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rawData = (indiaMapData as any).default || indiaMapData;
     if (rawData && rawData.objects && rawData.objects.states) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return feature(rawData, rawData.objects.states as any);
     }
     console.error("Invalid TopoJSON structure in india.json:", rawData);

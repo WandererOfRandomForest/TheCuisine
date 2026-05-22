@@ -9,6 +9,7 @@ export default function SplashScreen() {
 
   useEffect(() => {
     // Only run on client
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     // Trigger fade-in after a micro-delay to let the DOM paint
     const showTimeout = setTimeout(() => {
